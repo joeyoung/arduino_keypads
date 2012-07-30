@@ -1,0 +1,31 @@
+Description of arduino_keypads library add-ons
+
+G. D. (Joe) Young, July 25, 2012
+
+keypadreadme - this file
+
+folder Keypad - Mark Stanley, Alexander Brevig. arduino library
+
+folder Keypad_I2C - Joe Young. arduino library, extension of Keypad
+                    using PCF8574 I2C port chip
+
+folder Keypad_MCP - Joe Young. arduino library, extension of Keypad
+                    using MCP23008 I2C port chip
+
+The two folders Keypad and Keypad_I2C were posted to arduino web site as
+keypad.zip July 19/12, Keypad library is called version 3.0
+
+Within each folder are the .cpp, .h, and keywords.txt files comprising the 
+arduino library code, an additional folder called examples, and possibly
+another folder called docs. The directory structure is such that adding
+the library to the arduino environment is accomplished by placing the top
+level folders (Keypad, Keypad_I2C, and/or Keypad_MCP) into the libraries
+folder within the arduino sketchbook folder.
+
+Note that the base Keypad library (for direct connection of keypads to the
+arduino digital I/O pins) is posted here for completeness, but it will not
+be revised by me--see comments within source files Keypad.cpp, Keypad.h.
+I will be maintaining the I2C bus enhancements, possibly adding other 
+keypad interfaces, and the latest version(s) will be posted here on git hub.
+
+

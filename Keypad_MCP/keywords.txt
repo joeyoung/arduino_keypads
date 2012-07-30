@@ -1,0 +1,22 @@
+###########################################
+# Syntax Coloring Map For Keypad_MCP
+###########################################
+
+###########################################
+# Datatypes (KEYWORD1)
+###########################################
+
+Keypad_MCP	KEYWORD1
+
+###########################################
+# Methods and Functions (KEYWORD2)
+###########################################
+
+pinState_set	KEYWORD2
+port_write	KEYWORD2
+begin	KEYWORD2
+iodir_read	KEYWORD2
+iodir_write	KEYWORD2
+
+
+
