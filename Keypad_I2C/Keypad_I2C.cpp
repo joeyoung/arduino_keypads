@@ -96,6 +96,7 @@ void Keypad_I2C::port_write( byte i2cportval ) {
 byte Keypad_I2C::pinState_set( ) {
 	TwoWire::requestFrom( (int)i2caddr, 1 );
 	pinState = TwoWire::read( );
+	return pinState;
 } // set_pinState( )
 
 
