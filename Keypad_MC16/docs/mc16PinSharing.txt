@@ -1,0 +1,67 @@
+Regarding multiple instances of Keypad on same I2C port with pin sharing
+
+G. D. Young Feb 5/18
+
+See example EventKeypadThree_MC16
+
+Since each object actually uses the same port, each of their in-memory
+copies of the port's registers must always agree with respect to any
+pins being shared with some other thread. Consequently, in setup each
+object's direction register copy must be the same and reflect the 'other'
+thread setup. 
+
+In the example HelloKeypadThree_MC16, the 'other' thread is the loop
+controlling an LED indicator on one of the port pins unused for keypads
+(bit 11 in the example). Thus, the three statements:
+
+  kpdUR.iodir_write( kpdUR.iodir_read( ) & 0xf7ff );
+  kpdR.iodir_write( kpdR.iodir_read( ) & 0xf7ff );
+  kpd.iodir_write( kpd.iodir_read( ) & 0xf7ff );
+
+are all required so that the three keypad objects have their direction
+register copies modifying bit 11 to 0, making the pin an output pin.
+
+The reason this copying is needed is that while each keypad is careful to
+only modify port register bits that it uses, the entire register must be
+written each time it's accessed. So, the 'unused' bits need to be correct.
+
+Similarly, when the port's gpio register is written, it must be written 
+with all the keypad objects' port_write functions to keep the in-memory
+gpio copy in agreement. This requirement is illustrated in the toggleLED()
+function:
+
+void toggleLED( ) {
+    portState = kpdUR.pinState_set( );
+    if( portState & ledpin ) {
+      kpdUR.port_write( portState & 0xf7ff);
+      kpdR.port_write( portState & 0xf7ff);
+      kpd.port_write( portState & 0xf7ff);
+    } else {
+      kpdUR.port_write( portState | 0x0800 );
+      kpdR.port_write( portState | 0x0800 );
+      kpd.port_write( portState | 0x0800 );
+    }
+} // toggleLED( )
+
+
+Alternatively, the second and third objects could have used their
+pinState_set( ) functions to update their in-memory port copies. Either
+method generates I2C bus activity, to re-send the port value (port_write),
+or to read the port value (pinState_set). The toggleLED function would
+then look like:
+
+void toggleLED( ) {
+    portState = kpdUR.pinState_set( );
+    if( portState & ledpin ) {
+      kpdUR.port_write( portState & 0xf7ff );
+      kpdR.pinState_set( );  // update other objects pinState
+      kpd.pinState_set( );
+    } else {
+      kpdUR.port_write( portState | 0x0800 );
+      kpdR.pinState_set( );
+      kpd.pinState_set( );
+    }
+} // toggleLED( )
+
+
+
