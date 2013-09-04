@@ -8,6 +8,15 @@
 
 Keypad_I2C	KEYWORD1
 
+
+###########################################
+# Keypad_I2C Library constants
+###########################################
+
+PCF8574	LITERAL1
+PCF8575	LITERAL1
+
+
 ###########################################
 # Methods and Functions (KEYWORD2)
 ###########################################
@@ -16,4 +25,12 @@ pinState_set	KEYWORD2
 port_write	KEYWORD2
 begin	KEYWORD2
 
+
+###########################################
+# objects created in the example sketches.
+###########################################
+
+numpad	KEYWORD3
+ltrpad	KEYWORD3
+kpdR	KEYWORD3
 

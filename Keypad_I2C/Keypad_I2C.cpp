@@ -1,9 +1,9 @@
 /*
 ||
 || @file Keypad_I2C.h
-|| @version 1.0
-|| @author G. D. (Joe) Young
-|| @contact "G. D. (Joe) Young" <gdyoung@telus.net>
+|| @version 2.0 - PCF8575 support added by Paul Williamson
+|| @author G. D. (Joe) Young, ptw
+|| @contact "G. D. (Joe) Young" <jyoung@islandnet.com>
 ||
 || @description
 || | Keypad_I2C provides an interface for using matrix keypads that
@@ -64,7 +64,7 @@ void Keypad_I2C::begin(int address) {
 
 
 void Keypad_I2C::pin_write(byte pinNum, boolean level) {
-	byte mask = 1<<pinNum;
+	word mask = 1<<pinNum;
 	if( level == HIGH ) {
 		pinState |= mask;
 	} else {
@@ -75,9 +75,12 @@ void Keypad_I2C::pin_write(byte pinNum, boolean level) {
 
 
 int Keypad_I2C::pin_read(byte pinNum) {
-	byte mask = 0x1<<pinNum;
-	TwoWire::requestFrom((int)i2caddr, 1);
-	byte pinVal = TwoWire::read( );
+	word mask = 0x1<<pinNum;
+	TwoWire::requestFrom((int)i2caddr, (int)i2cwidth);
+	word pinVal = TwoWire::read( );
+	if (i2cwidth > 1) {
+		pinVal |= TwoWire::read( ) << 8;
+	} 
 	pinVal &= mask;
 	if( pinVal == mask ) {
 		return 1;
@@ -86,22 +89,30 @@ int Keypad_I2C::pin_read(byte pinNum) {
 	}
 }
 
-void Keypad_I2C::port_write( byte i2cportval ) {
+void Keypad_I2C::port_write( word i2cportval ) {
 	TwoWire::beginTransmission((int)i2caddr);
-	TwoWire::write( i2cportval );
+	TwoWire::write( i2cportval & 0x00FF);
+	if (i2cwidth > 1) {
+		TwoWire::write( i2cportval >> 8 );
+	}
 	TwoWire::endTransmission();
 	pinState = i2cportval;
 } // port_write( )
 
-byte Keypad_I2C::pinState_set( ) {
-	TwoWire::requestFrom( (int)i2caddr, 1 );
+word Keypad_I2C::pinState_set( ) {
+	TwoWire::requestFrom( (int)i2caddr, (int)i2cwidth );
 	pinState = TwoWire::read( );
+	if (i2cwidth > 1) {
+		pinState |= TwoWire::read( ) << 8;
+	}
 	return pinState;
 } // set_pinState( )
 
 
 /*
 || @changelog
+|| |
+|| | 2.0 2013-08-31 - Paul Williamson : Added i2cwidth parameter for PCF8575 support
 || |
 || | 1.0 2012-07-12 - Joe Young : Initial Release
 || #

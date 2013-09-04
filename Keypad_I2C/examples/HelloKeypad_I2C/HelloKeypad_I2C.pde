@@ -2,6 +2,8 @@
 
    Revised to use I2C i/o Feb 26/12 - G. D. Young
    Re-check with Keypad 3.0, arduino 1.0.1 Jul 29/12
+   Add port-type parameter to constructor for Paul
+   Williamson's modification of the Keypad_I2C library Sept 2/13
 
 || @version 1.0
 || @author Alexander Brevig
@@ -28,7 +30,7 @@ char keys[ROWS][COLS] = {
 byte rowPins[ROWS] = {0, 1, 2, 3}; //connect to the row pinouts of the keypad
 byte colPins[COLS] = {4, 5, 6}; //connect to the column pinouts of the keypad
 
-Keypad_I2C kpd( makeKeymap(keys), rowPins, colPins, ROWS, COLS, I2CADDR );
+Keypad_I2C kpd( makeKeymap(keys), rowPins, colPins, ROWS, COLS, I2CADDR, PCF8574 );
 
 void setup(){
   Wire.begin( );
