@@ -4,6 +4,8 @@ G. D. (Joe) Young, July 25, 2012
                    Aug 8, 2012 - removed Keypad lib folder
                    Feb 12, 2013 - add Keypad_MC16
                    Sep 2, 2013 - version 2.0 Keypad_I2C
+				   Nov 30, 2013 - minor changes to 'using..' doc for 8575,
+								  add datasheet, pin share example
 
 keypadreadme - this file
 
@@ -33,6 +35,10 @@ libraries folder within the arduino sketchbook folder.
 September 2, 2013 - Paul Williamson has extended the Keypad_I2C library
 so that it now supports the PCF8575 16-bit I2C port IC, while retaining 
 backward compatibility with the PCF8574 8-bit I2C port IC. 
+
+November 30, 2013 - Verified use with PCF8575, note difference between
+PCF8575 (pullups) and PCF8575C (no pullups) in 'using...' document, add
+HelloKeyShr example to illustrate port pin sharing feature.
 
 I will be maintaining the I2C bus enhancements, possibly adding other 
 keypad interfaces, and the latest version(s) will be posted here on 
