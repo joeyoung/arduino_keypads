@@ -4,8 +4,9 @@ G. D. (Joe) Young, July 25, 2012
                    Aug 8, 2012 - removed Keypad lib folder
                    Feb 12, 2013 - add Keypad_MC16
                    Sep 2, 2013 - version 2.0 Keypad_I2C
-				   Nov 30, 2013 - minor changes to 'using..' doc for 8575,
-								  add datasheet, pin share example
+                   Nov 30, 2013 - minor changes to 'using..' doc for 8575,
+                                  add datasheet, pin share example
+                   May 19, 2014 - add Keypad_MC17
 
 keypadreadme - this file
 
@@ -17,6 +18,9 @@ folder Keypad_MCP - Joe Young. arduino library, extension of Keypad
 
 folder Keypad_MC16- Joe Young. arduino library, extension of Keypad
                     using MCP23016 I2C, 16-bit port chip
+
+folder Keypad_MC17- Joe Young. arduino library, extension of Keypad
+                    using MCP23017 I2C, 16-bit port chip
 
 To use the Keypad_xxx libraries requires that the Keypad library be 
 present and its header <Keypad.h> be included within your sketch. 
@@ -39,6 +43,10 @@ backward compatibility with the PCF8574 8-bit I2C port IC.
 November 30, 2013 - Verified use with PCF8575, note difference between
 PCF8575 (pullups) and PCF8575C (no pullups) in 'using...' document, add
 HelloKeyShr example to illustrate port pin sharing feature.
+
+May 19, 2014 - Add Keypad_MC17. Originally discussed with Chris Atomix,
+2014-01-17. The MCP23017 can be similar to MCP23016, but it has internal
+pullups which must be enabled, and 16-bit mode is assumed for the library. 
 
 I will be maintaining the I2C bus enhancements, possibly adding other 
 keypad interfaces, and the latest version(s) will be posted here on 
