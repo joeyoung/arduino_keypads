@@ -1,0 +1,36 @@
+###########################################
+# Syntax Coloring Map For Keypad_I2Ca
+###########################################
+
+###########################################
+# Datatypes (KEYWORD1)
+###########################################
+
+Keypad_I2Ca	KEYWORD1
+
+
+###########################################
+# Keypad_I2C Library constants
+###########################################
+
+PCA9554	LITERAL1
+PCA9555	LITERAL1
+
+
+###########################################
+# Methods and Functions (KEYWORD2)
+###########################################
+
+pinState_set	KEYWORD2
+port_write	KEYWORD2
+begin	KEYWORD2
+
+
+###########################################
+# objects created in the example sketches.
+###########################################
+
+numpad	KEYWORD3
+ltrpad	KEYWORD3
+kpdR	KEYWORD3
+

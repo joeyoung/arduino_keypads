@@ -7,11 +7,15 @@ G. D. (Joe) Young, July 25, 2012
                    Nov 30, 2013 - minor changes to 'using..' doc for 8575,
                                   add datasheet, pin share example
                    May 19, 2014 - add Keypad_MC17
+                   May 24, 2014 - add Keypad_I2Ca
 
 keypadreadme - this file
 
 folder Keypad_I2C - Joe Young. arduino library, extension of Keypad
                     using PCF8574 or PCF8575 I2C port chip
+
+folder Keypad_I2Ca -Joe Young, arduino library, extension of Keypad
+                    using PCA9554 or PCA9555 I2C port chips
 
 folder Keypad_MCP - Joe Young. arduino library, extension of Keypad
                     using MCP23008 I2C port chip
@@ -46,7 +50,11 @@ HelloKeyShr example to illustrate port pin sharing feature.
 
 May 19, 2014 - Add Keypad_MC17. Originally discussed with Chris Atomix,
 2014-01-17. The MCP23017 can be similar to MCP23016, but it has internal
-pullups which must be enabled, and 16-bit mode is assumed for the library. 
+pullups which must be enabled, and 16-bit mode is assumed for the library.
+
+May 24, 2014 - Add Keypad_I2Ca. Use PCA9554, PCA9554A, (8-bit) and PCA9555
+(16-bit) port chips for a drop-in, higher-drive upgrade of PCF8574,5 I2C
+ports.
 
 I will be maintaining the I2C bus enhancements, possibly adding other 
 keypad interfaces, and the latest version(s) will be posted here on 

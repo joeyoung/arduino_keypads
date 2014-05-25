@@ -1,0 +1,48 @@
+Notes comparing Keypad_I2C and Keypad_I2Ca arduino libraries.
+
+May 24, 2014  -  G. D. (Joe) Young <jyoung@islandnet.com>
+
+
+Keypad_I2Ca supports the PCA9554, PCA9554A, and PCA9555 I2C bus, I/O expansion
+port chips. The Keypad_I2C library (no 'a') supports the PCF8574, PCF8574A,
+PCF8575, and PCF8575C port chips.
+
+By way of explanation for the confusing names, all these Keypad_xxxx libraries
+grew from the original extension of the Keypad arduino library (authors Mark 
+Stanley and Alexander Brevig) to use I2C bus I/O with just the PCF8574, 8-bit, 
+simplest port chip. That library was called Keypad_I2C. Then, from curiosity
+about other port expansion devices, from specific requests by some users, and
+from a supplied modification by Paul Williamson, several other port chips were
+fitted with libraries--all of them called Keypad_????. Most of these other
+chips are sufficiently different from one another that there is not a
+straightforward way to make one set of library functions adaptable to the
+different devices--hence the many unique names/libraries. However, the PCF8574
+(8-bit) and PCF8575 (16-bit) can use the same functions with the addition of
+one number-of-bytes parameter to the keypad object's constructor. That addition
+is now implemented in the latest Keypad_I2C. Similarly, the PCA9554 (8-bit) and
+PCA9555 (16-bit) are enough alike (see NXP application note AN469) that they
+can share a common set of library functions. Inspired by AN469, I originally
+began assuming I could elaborate the Keypad_I2C library and have one set of
+functions for all 4 types of device. But that assumption was overly optimistic
+because the PCA955x chips with their higher drive capability, totem-pole
+outputs require data direction configuration of the port bits. That brings in
+several functions that the PCF857x devices do not need, so in the interest of
+minimizing code size for the 'normal' case where only one type of device would
+be used, I separated the libraries.
+
+Because the PCA9554 has identical pinouts to the PCF8574, and the PCA9555 to
+the PCF8575, the circuit connections are identical. Hence I include the wiring
+diagram example for the PCF8574 in document I2CKeypadDatasheet.pdf unchanged as
+a method of hooking up the keypad for the PCA9554. Similarly, the wiring for
+the PCA9555 would be the same as for the PCF8575.
+
+If one wanted to upgrade a system to use the higher drive capability of the
+PCA955x port, the original system footprint can be retained and only the 
+identifier Keypad_I2C needs to change to Keypad_I2Ca (in the constructor and in
+the #include statement).
+
+The constructor for Keypad_I2C has a final parameter which can be omitted if
+using PCF8574s or set to PCF8575. Similarly, the constructor for Keypad_I2Ca
+accepts PCA9555 in the final parameter position to select the 16-bit port.
+
+
