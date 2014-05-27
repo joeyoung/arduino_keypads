@@ -36,8 +36,15 @@
 #include "Keypad.h"
 #include "Wire.h"
 
+// literals to use to define the width of the port--last parameter in constructors
 #define PCA9554 1	// PCA9554 I/O expander device is 1 byte wide
 #define PCA9555 2	// PCA9555 I/O expander device is 2 bytes wide
+#define PCA9539 2
+#define PCA9534 1
+#define PCA9535 2
+#define TCA6408 1
+#define TCA6416 2
+
 
 class Keypad_I2Ca : public Keypad, public TwoWire {
 public:

@@ -1,6 +1,7 @@
 Notes comparing Keypad_I2C and Keypad_I2Ca arduino libraries.
 
 May 24, 2014  -  G. D. (Joe) Young <jyoung@islandnet.com>
+May 26, 2014  -  checked out more compatible ports -- see below
 
 
 Keypad_I2Ca supports the PCA9554, PCA9554A, and PCA9555 I2C bus, I/O expansion
@@ -44,5 +45,46 @@ the #include statement).
 The constructor for Keypad_I2C has a final parameter which can be omitted if
 using PCF8574s or set to PCF8575. Similarly, the constructor for Keypad_I2Ca
 accepts PCA9555 in the final parameter position to select the 16-bit port.
+
+
+May 26, 2014
+------------
+
+The register structure of the PCA9539, PCA9539A is the same as the PCA9555 
+16-bit port, so the library works with that chip. The PCA9539 does not have
+internal pullups so they must be provided externally. I2C addresses 0x74..0x77.
+
+The register structure of the TCA6408A is the same as the PCA9554 8-bit port, 
+so the library works with that chip too. External pullups are also required.
+I2C addresses 0x20 or 0x21. Built-in signal level translation.
+
+PCA9539 and TCA6408 were chosen as representatives of a fairly large group of
+software-compatible parts in the PCA9555 and PCA9554 family. While the parts
+listed below have not been wired up to verify compatibility with Keypad_I2Ca,
+all should work. If anyone confirms/counters this compatibility, please let me
+know:
+ TCA6416A - 16-bit port, addresses 0x20 or 0x21, sig level translating.
+ PCA9554A - 8-bit port, addresses 0x70..0x77 (PCA9554 is 0x20..0x27).
+ PCA9535 - 16-bit port, addresses 0x20..0x27
+ PCA9534 - 8-bit port, addresses 0x20..0x27
+ PCA9534A - 8-bit port, addresses 0x70..0x77
+
+The library Keypad_I2Ca.h has literals defined for all of these names, to be 
+used as the final constructor parameter to select 8-bit, or 16-bit ports.
+
+See NXP AN469, or the TI datasheet for PCA9534 for a list of port expanders and
+their distinguishing features. Note that many of the differences concern the
+presence/absence of pullups on the input pins. The point of not having pullups
+is that the port's power requirement is minimized for outputs that will be 
+driven low during normal operation. With the Keypad interface, only the column
+outputs are driven low during keyboard scanning and are set to be inputs the
+rest of the time, so the pullups are not power gobblers and are assumed to be
+present for normal operation. Consequently, the devices incorporating pullups
+within the chip are preferred for their circuit simplicity.
+
+The TCA ports have built-in signal level translation, so can simplify (by not
+needing separate level translators) wiring in systems with mixed signal voltage
+levels. They seem to sacrifice one of the address pins to provide a connection
+for the second power pin.
 
 
