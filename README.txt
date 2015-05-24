@@ -9,6 +9,7 @@ G. D. (Joe) Young, July 25, 2012
                    May 19, 2014 - add Keypad_MC17
                    May 24, 2014 - add Keypad_I2Ca
                    May 27, 2014 - additional devices with Keypad_I2Ca
+                   May 24, 2015 - Keypad_tw - TinyWireM version for PCF857xx
 
 keypadreadme - this file
 
@@ -27,6 +28,9 @@ folder Keypad_MC16- Joe Young. arduino library, extension of Keypad
 
 folder Keypad_MC17- Joe Young. arduino library, extension of Keypad
                     using MCP23017 I2C, 16-bit port chip
+
+folder Keypad_tw  - Joe Young, arduino library, extension of Keypad
+                    using PCF857xx I2C, port chips
 
 To use the Keypad_xxx libraries requires that the Keypad library be 
 present and its header <Keypad.h> be included within your sketch. 
@@ -61,6 +65,9 @@ ports.
 May 27, 2014 - confirm (with PCA9539 and TCA6403) that several other port
 expanders are compatible with Keypad_I2Ca. See notes file in documents
 folder included within Keypad_I2Ca library.
+
+May 24, 2015 - Using TinyWireM library for port expansion on ATtiny 
+processors. First one tested with PCF8574, PCF8574A chips on ATtiny85.
 
 I will be maintaining the I2C bus enhancements, possibly adding other 
 keypad interfaces, and the latest version(s) will be posted here on 

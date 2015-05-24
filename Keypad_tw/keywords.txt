@@ -1,25 +1,22 @@
 ###########################################
-# Syntax Coloring Map For Keypad_I2Ca
+# Syntax Coloring Map For Keypad_I2C
 ###########################################
 
 ###########################################
 # Datatypes (KEYWORD1)
 ###########################################
 
-Keypad_I2Ca	KEYWORD1
+Keypad_tw	KEYWORD1
 
 
 ###########################################
 # Keypad_I2C Library constants
 ###########################################
 
-PCA9554	LITERAL1
-PCA9555	LITERAL1
-PCA9539	LITERAL1
-PCA9534	LITERAL1
-PCA9535	LITERAL1
-TCA6408	LITERAL1
-TCA6416	LITERAL1
+PCF8574	LITERAL1
+PCF8574A	LITERAL1
+PCF8575	LITERAL1
+
 
 ###########################################
 # Methods and Functions (KEYWORD2)
