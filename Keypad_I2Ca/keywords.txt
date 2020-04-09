@@ -26,7 +26,12 @@ TCA6416	LITERAL1
 ###########################################
 
 pinState_set	KEYWORD2
+pin_mode	KEYWORD2
+pin_read	KEYWORD2
+pin_write	KEYWORD2
 port_write	KEYWORD2
+iodir_read	KEYWORD2
+iodir_write	KEYWORD2
 begin	KEYWORD2
 
 

@@ -81,12 +81,12 @@
 
      Modified to use I2C i/o G. D. (Joe) Young - Feb 28/12
 */
-#include <Keypad_I2C.h>
+#include <Keypad_I2Ca.h>
 #include <Keypad.h>
 #include <ctype.h>
 #include <Wire.h>
 
-#define I2CADDR 0x38
+#define I2CADDR 0x77
 
 const byte ROWS = 4; //four rows
 const byte COLS = 3; //three columns
@@ -108,21 +108,21 @@ char numberKeys[ROWS][COLS] = {
 boolean alpha = false;   // Start with the numeric keypad.
 char* keypadMap = (alpha == true) ? makeKeymap(alphaKeys) : makeKeymap(numberKeys);
 
-byte rowPins[ROWS] = {0, 1, 2, 3}; 	//connect to the row pinouts of the keypad
-byte colPins[COLS] = {4, 5, 6}; 	//connect to the column pinouts of the keypad
+//no name keypad pins
+byte rowPins[ROWS] = {13, 8, 9, 11}; 	//connect to the row pinouts of the keypad
+byte colPins[COLS] = {12, 14, 10}; 	//connect to the column pinouts of the keypad
 
 //create a new Keypad
-Keypad_I2C keypad(keypadMap, rowPins, colPins, sizeof(rowPins), sizeof(colPins), I2CADDR);
+Keypad_I2Ca keypad(keypadMap,rowPins,colPins,sizeof(rowPins),sizeof(colPins),I2CADDR, PCA9539 );
 
 unsigned long startTime;
 const byte ledPin = 13;	                                                 // Use the LED on pin 13.
 
 void setup() {
     Serial.begin(9600);
-    while( !Serial ){/*wait*/}
+    while( !Serial ){ /*wait*/ }
     Wire.begin( );
     keypad.begin( );
-    keypad.port_write( 0xff );
     pinMode(ledPin, OUTPUT);
     digitalWrite(ledPin, LOW);                                                // Turns the LED on.
     keypad.addEventListener(keypadEvent);                                      // Add an event listener.

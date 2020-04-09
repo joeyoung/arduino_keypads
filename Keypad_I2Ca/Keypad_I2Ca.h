@@ -1,6 +1,7 @@
 /*
 ||
-|| @file Keypad_I2C.h
+|| @file Keypad_I2Ca.h
+|| @version 4.0 - fix compile error, allow WireX in constructor
 || @version 3.0 - PCA9554, PCA9554A, PCA9555 support G. D. Young
 || @version 2.0 - PCF8575 support added by Paul Williamson
 || @author G. D. (Joe) Young, ptw
@@ -10,6 +11,13 @@
 || | Keypad_I2C provides an interface for using matrix keypads that
 || | are attached to I2C port expanders. It supports multiple keypads,
 || | user selectable pins, and user defined keymaps.
+|| #
+||
+|| @version 4.0 - April 5, 2020
+|| | MKRZERO, ESP32 compile error from inheriting TwoWire that was OK with
+|| | original ATMEGA boards; possibly because newer processors can have
+|| | multiple I2C WireX ports. Consequently, added the ability to specify
+|| | an alternate Wire as optional parameter in constructor.
 || #
 ||
 || @license
@@ -46,10 +54,11 @@
 #define TCA6416 2
 
 
-class Keypad_I2Ca : public Keypad, public TwoWire {
+class Keypad_I2Ca : public Keypad {
 public:
-	Keypad_I2Ca(char* userKeymap, byte* row, byte* col, byte numRows, byte numCols, byte address, byte width = 1) :
-		Keypad(userKeymap, row, col, numRows, numCols) { i2caddr = address; i2cwidth = width;}	
+	Keypad_I2Ca(char* userKeymap, byte* row, byte* col, byte numRows, byte numCols, byte address,
+			byte width = 1, TwoWire *_awire = &Wire ) :
+		Keypad(userKeymap, row, col, numRows, numCols) { i2caddr = address; i2cwidth = width; _wire=_awire; }	
 	
 
 	// Keypad function
@@ -57,9 +66,6 @@ public:
 	// Wire function
 	void begin(void);
 	// Wire function
-	void begin(byte address);
-	// Wire function
-	void begin(int address);
 
 	void pin_mode(byte pinNum, byte mode);
 	void pin_write(byte pinNum, boolean level);
@@ -75,6 +81,7 @@ public:
 private:
     // I2C device address
     byte i2caddr;
+	TwoWire * _wire;	//for optional alternate WireX port
     // I2C port expander device width in bytes (1 for 8574, 2 for 8575)
     byte i2cwidth;
 	// I2C pin_write state persistant storage
@@ -91,6 +98,8 @@ private:
 
 /*
 || @changelog
+||
+|| | 4.0 2020-04-06 - GDY fix compile error, allow WireX in constructor
 || |
 || | 3.0 2014-05-22 - GDY support totem-pole output ports PCA9554(8-bit), PCA9555(16-bit)
 || |

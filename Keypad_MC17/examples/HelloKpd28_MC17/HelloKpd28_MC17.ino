@@ -32,6 +32,8 @@ Keypad_MC17 keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS, I2CADDR );
 
 void setup(){
   Serial.begin(9600);
+  while( !Serial ){/*wait*/}
+  Wire.begin( );
   keypad.begin( );
 //  keypad.setDebounceTime( 100 );
 }

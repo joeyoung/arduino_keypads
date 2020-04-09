@@ -7,6 +7,9 @@
    * Use Keypad_I2Ca support for PCA9554, PCA9555 port chips GDY 14-5-23
      HelloKeypad_I2Ca set to use PCA9555 with keypad on IO1 bits,
      Sparkfun keypad.
+   * Revised to illustrate optional alternate wire port. Note that the 'width'
+     optional parameter must be included if the optional wire is used. OK to
+     omit both for 8-bit i/o expanders on Wire. 
 
 || @version 1.0
 || @author Alexander Brevig
@@ -17,9 +20,9 @@
 || #
 */
 #include <Keypad_I2Ca.h>
-#include <Keypad.h>
+#include <Keypad.h> 
 #include <Wire.h>
-#define I2CADDR 0x27
+#define I2CADDR 0x77
 
 const byte ROWS = 4; //four rows
 const byte COLS = 3; //three columns
@@ -32,13 +35,15 @@ char keys[ROWS][COLS] = {
 // Digitran keypad, bit numbers of PCF8574 i/o port
 byte rowPins[ROWS] = {13, 8, 9, 11}; //connect to the row pinouts of the keypad
 byte colPins[COLS] = {12, 14, 10}; //connect to the column pinouts of the keypad
-
-Keypad_I2Ca kpd( makeKeymap(keys), rowPins, colPins, ROWS, COLS, I2CADDR, PCA9555 );
+TwoWire* jwire = &Wire;
+Keypad_I2Ca kpd( makeKeymap(keys), rowPins, colPins, ROWS, COLS, I2CADDR, PCA9555, jwire );
 
 void setup(){
-  Wire.begin( );
-  kpd.begin( makeKeymap(keys) );
   Serial.begin(9600);
+  while( !Serial ){/*wait*/}
+//  Wire.begin( );
+  jwire->begin( );
+//  kpd.begin( makeKeymap(keys) );
   Serial.println( "start" );
   Serial.println( kpd.pinState_set( ), HEX );
   Serial.println( kpd.iodir_read( ), HEX );

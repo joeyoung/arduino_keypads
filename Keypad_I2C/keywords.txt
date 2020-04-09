@@ -33,4 +33,6 @@ begin	KEYWORD2
 numpad	KEYWORD3
 ltrpad	KEYWORD3
 kpdR	KEYWORD3
+kpdL	KEYWORD3
+kpd	KEYWORD3
 

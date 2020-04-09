@@ -1,5 +1,5 @@
 ###########################################
-# Syntax Coloring Map For Keypad_MC17
+# Syntax Coloring Map For Keypad_I2C
 ###########################################
 
 ###########################################
@@ -8,19 +8,35 @@
 
 Keypad_MC17	KEYWORD1
 
+
+###########################################
+# Keypad_I2C Library constants
+###########################################
+
+MCP23017	LITERAL1
+
+
 ###########################################
 # Methods and Functions (KEYWORD2)
 ###########################################
 
 pinState_set	KEYWORD2
+pin_mode	KEYWORD2
+pin_read	KEYWORD2
+pin_write	KEYWORD2
 port_write	KEYWORD2
-begin	KEYWORD2
 iodir_read	KEYWORD2
 iodir_write	KEYWORD2
+begin	KEYWORD2
 
-# List of objects created in the example sketches.
-kpd	KEYWORD3
-kpdR	KEYWORD3
-kpdUR	KEYWORD3
+
+###########################################
+# objects created in the example sketches.
+###########################################
+
 keypad	KEYWORD3
+keypad1	KEYWORD3
+keypad2	KEYWORD3
+keypad3	KEYWORD3
+keypad4	KEYWORD3
 

@@ -1,6 +1,7 @@
 /*
 ||
 || @file Keypad_I2Ca.h
+|| @version 4.0 - fix compile error, allow WireX in constructor
 || @version 3.0 - PCA9554, PCA9554A, PCA9555 support G. D. Young
 || @version 2.0 - PCF8575 support added by Paul Williamson
 || @author G. D. (Joe) Young, ptw
@@ -10,6 +11,13 @@
 || | Keypad_I2Ca provides an interface for using matrix keypads that
 || | are attached with I2C totem-pole output port expanders. It supports
 || | multiple keypads, user selectable pins, and user defined keymaps.
+|| #
+||
+|| @version 4.0 - April 5, 2020
+|| | MKRZERO, ESP32 compile error from inheriting TwoWire that was OK with
+|| | original ATMEGA boards; possibly because newer processors can have
+|| | multiple I2C WireX ports. Consequently, added the ability to specify
+|| | an alternate Wire as optional parameter in constructor.
 || #
 ||
 || @license
@@ -41,22 +49,22 @@
 // Let the user define a keymap - assume the same row/column count as defined in constructor
 void Keypad_I2Ca::begin(char *userKeymap) {
     Keypad::begin(userKeymap);
-	TwoWire::begin();
+//	_wire->begin();
 	_begin( );
 }
 
 
 // Initialize I2C
 void Keypad_I2Ca::begin(void) {
-	TwoWire::begin();
+//	_wire->begin();
 	_begin( );
 }
 
-
+#if 0
 // Initialize I2C
 void Keypad_I2Ca::begin(byte address) {
 	i2caddr = address;
-	TwoWire::begin(address);
+	_wire->begin(address);
 	_begin( );
 }
 
@@ -64,10 +72,10 @@ void Keypad_I2Ca::begin(byte address) {
 // Initialize I2C
 void Keypad_I2Ca::begin(int address) {
 	i2caddr = address;
-	TwoWire::begin(address);
+	_wire->begin(address);
 	_begin( );
 }
-
+#endif
 
 // configure port registers as if just power-on reset
 void Keypad_I2Ca::_begin( ) {
@@ -103,13 +111,13 @@ void Keypad_I2Ca::pin_write(byte pinNum, boolean level) {
 
 int Keypad_I2Ca::pin_read(byte pinNum) {
 	word mask = 0x1<<pinNum;
-	TwoWire::beginTransmission( (int)i2caddr );
-	TwoWire::write( IREG );
-	TwoWire::endTransmission( );
-	TwoWire::requestFrom((int)i2caddr, (int)i2cwidth);
-	word pinVal = TwoWire::read( );
+	_wire->beginTransmission( (int)i2caddr );
+	_wire->write( IREG );
+	_wire->endTransmission( );
+	_wire->requestFrom((int)i2caddr, (int)i2cwidth);
+	word pinVal = _wire->read( );
 	if (i2cwidth > 1) {
-		pinVal |= TwoWire::read( ) << 8;
+		pinVal |= _wire->read( ) << 8;
 	} 
 	pinVal &= mask;
 	if( pinVal == mask ) {
@@ -125,36 +133,36 @@ void Keypad_I2Ca::port_write( word i2cportval ) {
 
 
 void Keypad_I2Ca::p_write( word i2cportval, byte reg ) {
-	TwoWire::beginTransmission((int)i2caddr);
-	TwoWire::write( reg<<(i2cwidth-1) );			//twice as many regs for 9555
-	TwoWire::write( i2cportval & 0x00FF );
+	_wire->beginTransmission((int)i2caddr);
+	_wire->write( reg<<(i2cwidth-1) );			//twice as many regs for 9555
+	_wire->write( i2cportval & 0x00FF );
 	if (i2cwidth > 1) {
-		TwoWire::write( i2cportval >> 8 );
+		_wire->write( i2cportval >> 8 );
 	}
-	TwoWire::endTransmission();
+	_wire->endTransmission();
 //	if( reg == OREG) pinState = i2cportval;		//not quite right - re-read i/p??
 	if( reg == OREG) pinState = pinState_set( );
 } // p_write( ) - private
 
 
 word Keypad_I2Ca::pinState_set( ) {
-	TwoWire::beginTransmission( (int)i2caddr );
-	TwoWire::write( IREG );
-	TwoWire::endTransmission( );
-	TwoWire::requestFrom( (int)i2caddr, (int)i2cwidth );
-	pinState = TwoWire::read( );
+	_wire->beginTransmission( (int)i2caddr );
+	_wire->write( IREG );
+	_wire->endTransmission( );
+	_wire->requestFrom( (int)i2caddr, (int)i2cwidth );
+	pinState = _wire->read( );
 	if (i2cwidth > 1) {
-		pinState |= TwoWire::read( ) << 8;
+		pinState |= _wire->read( ) << 8;
 	}
 	return pinState;
 } // set_pinState( )
 
 
 word Keypad_I2Ca::iodir_read( ) {
-//	TwoWire::requestFrom( (int)i2caddr, (int)i2cwidth );
-//	iodir_state = TwoWire::read( );
+//	_wire->requestFrom( (int)i2caddr, (int)i2cwidth );
+//	iodir_state = _wire->read( );
 //	if( i2cwidth > 1 ) {
-//		iodir_state |= TwoWire::read( ) << 8;
+//		iodir_state |= _wire->read( ) << 8;
 //	}
 	return iodir_state;
 } // iodir_read( )
@@ -167,6 +175,8 @@ void Keypad_I2Ca::iodir_write( word iodir ) {
 
 /*
 || @changelog
+|| |
+|| | 4.0 2020-04-06 - GDY fix compile error, allow WireX in constructor
 || |
 || | 3.0 2014-05-22 - GDY support totem-pole output ports PCA9554(8-bit), PCA9555(16-bit)
 || |

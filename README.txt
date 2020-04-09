@@ -69,6 +69,16 @@ folder included within Keypad_I2Ca library.
 May 24, 2015 - Using TinyWireM library for port expansion on ATtiny 
 processors. First one tested with PCF8574, PCF8574A chips on ATtiny85.
 
+Apr 08, 2020 - With MKR ZERO, ESP32, possibly other newer boards, the
+inheritance of TwoWire mechanism used resulted in compile error on the
+Keypad_xxxx constructor. The Wire library now allows (but not currently
+implemented) for more than one I2C port, so the Keypad_xxxx libraries
+now have an added optional parameter in their constructors to specify 
+the WireX to use for that Keypad_xxx object. The modified libraries may
+require slight variations in the setup() - need kpd.begin(), wait for
+serial for MKR. Some of the older examples have been left unchanged, see
+HelloKeypad_I2C for current setup().
+
 I will be maintaining the I2C bus enhancements, possibly adding other 
 keypad interfaces, and the latest version(s) will be posted here on 
 github.

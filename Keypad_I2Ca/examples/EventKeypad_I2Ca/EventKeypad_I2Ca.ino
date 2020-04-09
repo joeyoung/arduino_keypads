@@ -8,12 +8,13 @@
 || #
 
    Modified to use I2C i/o - G. D. (Joe) Young Feb 28/12
+   Using totem-pole output I2C ports 9554, 9555 GDY May 23/14
 */
-#include <Keypad_I2C.h>
+#include <Keypad_I2Ca.h>
 #include <Keypad.h>          // GDY120705
 #include <Wire.h>
 
-#define I2CADDR 0x38
+#define I2CADDR 0x77
 
 const byte ROWS = 4; //four rows
 const byte COLS = 3; //three columns
@@ -23,10 +24,10 @@ char keys[ROWS][COLS] = {
 	{'7','8','9'},
 	{'*','0','#'}
 	};
-byte rowPins[ROWS] = {0, 1, 2, 3}; //connect to the row pinouts of the keypad
-byte colPins[COLS] = {4, 5, 6}; //connect to the column pinouts of the keypad
+byte rowPins[ROWS] = {13, 8, 9, 11}; //connect to the row pinouts of the keypad
+byte colPins[COLS] = {12, 14, 10}; //connect to the column pinouts of the keypad
 	
-Keypad_I2C keypad = Keypad_I2C( makeKeymap(keys), rowPins, colPins, ROWS, COLS, I2CADDR );
+Keypad_I2Ca keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS, I2CADDR, PCA9555 );
 byte ledPin = 13; 
 
 boolean blink = false;
