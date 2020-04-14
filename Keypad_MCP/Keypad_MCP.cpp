@@ -1,6 +1,7 @@
 /*
 ||
 || @file Keypad_MCP.h
+|| @version 2.0
 || @version 1.0
 || @author G. D. (Joe) Young
 || @contact "G. D. (Joe) Young" <gdyoung@telus.net>
@@ -12,11 +13,18 @@
 || | defined keymaps.
 || #
 ||
+|| @version 2.0 - April 5, 2020
+|| | MKRZERO, ESP32 compile error from inheriting TwoWire that was OK with
+|| | original ATMEGA boards; possibly because newer processors can have
+|| | multiple I2C WireX ports. Consequently, added the ability to specify
+|| | an alternate Wire as optional parameter in constructor.
+|| #
+||
 || @license
 || | This library is free software; you can redistribute it and/or
 || | modify it under the terms of the GNU Lesser General Public
 || | License as published by the Free Software Foundation; version
-|| | 2.1 of the License.
+|| | 2.1 of the License or any later version.
 || |
 || | This library is distributed in the hope that it will be useful,
 || | but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,8 +32,8 @@
 || | Lesser General Public License for more details.
 || |
 || | You should have received a copy of the GNU Lesser General Public
-|| | License along with this library; if not, write to the Free Software
-|| | Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+|| | License along with this library; if not, see 
+|| | <https://www.gnu.org/licenses/> 
 || #
 ||
 */
@@ -42,7 +50,7 @@
 
 // Let the user define a keymap - assume the same row/column count as defined in constructor
 void Keypad_MCP::begin(char *userKeymap) {
-	TwoWire::begin();
+//	_wire->begin();
     Keypad::begin(userKeymap);
 	_begin( );
 	pinState = pinState_set( );
@@ -53,16 +61,17 @@ void Keypad_MCP::begin(char *userKeymap) {
 
 // Initialize MCP
 void Keypad_MCP::begin(void) {
-	TwoWire::begin();
+//	_wire->begin();
 	_begin( );
 //	pinState = 0xff;
 	pinState = pinState_set( );
 }
 
+#if 0
 // Initialize MCP
 void Keypad_MCP::begin(byte address) {
 	i2caddr = address;
-	TwoWire::begin(address);
+	_wire->begin(address);
 	_begin( );
 //	pinState = 0xff;
 	pinState = pinState_set( );
@@ -70,11 +79,12 @@ void Keypad_MCP::begin(byte address) {
 
 void Keypad_MCP::begin(int address) {
 	i2caddr = address;
-	TwoWire::begin(address);
+	_wire->begin(address);
 	_begin( );
 //	pinState = 0xff;
 	pinState = pinState_set( );
 } // begin( int )
+#endif
 
 byte iodirec = 0xff;            //direction of each bit - reset state = all inputs.
 byte MCPconfig[11] = { IODIR, iodirec, 0, 0, 0, 0, 0x00, iodirec, 0, 0, 0xff };
@@ -86,20 +96,20 @@ void Keypad_MCP::_begin( void ) {
 	iodir_state = iodirec;
 	MCPconfig[1] = iodirec;		// direction register
 	MCPconfig[7] = iodirec;		// pullup resistors register--pullup inputs
-	TwoWire::beginTransmission( (int)i2caddr );
-	TwoWire::write( IOCON ); // turn on register address incrementing
-	TwoWire::write( 0x00 );
-	TwoWire::endTransmission( );
-	TwoWire::beginTransmission( (int)i2caddr );
-	TwoWire::write( MCPconfig, 11 ); // setup port--leave adr incr ON
-	TwoWire::endTransmission( );
-	TwoWire::beginTransmission( (int)i2caddr );
-	TwoWire::write( IOCON ); // turn OFF register address incrementing
-	TwoWire::write( 0x20 );
-	TwoWire::endTransmission( );
-	TwoWire::beginTransmission( (int)i2caddr );
-	TwoWire::write( GPIO );	//point register pointer to gpio reg
-	TwoWire::endTransmission( );
+	_wire->beginTransmission( (int)i2caddr );
+	_wire->write( IOCON ); // turn on register address incrementing
+	_wire->write( 0x00 );
+	_wire->endTransmission( );
+	_wire->beginTransmission( (int)i2caddr );
+	_wire->write( MCPconfig, 11 ); // setup port--leave adr incr ON
+	_wire->endTransmission( );
+	_wire->beginTransmission( (int)i2caddr );
+	_wire->write( IOCON ); // turn OFF register address incrementing
+	_wire->write( 0x20 );
+	_wire->endTransmission( );
+	_wire->beginTransmission( (int)i2caddr );
+	_wire->write( GPIO );	//point register pointer to gpio reg
+	_wire->endTransmission( );
 } // _begin( )
 
 // individual pin setup - modify pin bit in IODIR reg. Don't change pullups
@@ -110,13 +120,13 @@ void Keypad_MCP::pin_mode(byte pinNum, byte mode) {
 	} else {     // here, could check for pullup ON/OFF - omitted for now
 		iodir_state |= mask;
 	} // if mode
-	TwoWire::beginTransmission((int)i2caddr);
-	TwoWire::write( IODIR );
-	TwoWire::write( iodir_state );
-	TwoWire::endTransmission();
-	TwoWire::beginTransmission((int)i2caddr);	// reset adr pointer to gpio
-	TwoWire::write( GPIO );
-	TwoWire::endTransmission();
+	_wire->beginTransmission((int)i2caddr);
+	_wire->write( IODIR );
+	_wire->write( iodir_state );
+	_wire->endTransmission();
+	_wire->beginTransmission((int)i2caddr);	// reset adr pointer to gpio
+	_wire->write( GPIO );
+	_wire->endTransmission();
 } // pin_mode( )
 
 void Keypad_MCP::pin_write(byte pinNum, boolean level) {
@@ -133,8 +143,8 @@ void Keypad_MCP::pin_write(byte pinNum, boolean level) {
 
 int Keypad_MCP::pin_read(byte pinNum) {
 	byte mask = 0x1<<pinNum;
-	TwoWire::requestFrom((int)i2caddr, 1);
-	byte pinVal = TwoWire::read( );
+	_wire->requestFrom((int)i2caddr, 1);
+	byte pinVal = _wire->read( );
 	pinVal &= mask;
 	if( pinVal == mask ) {
 		return 1;
@@ -145,16 +155,16 @@ int Keypad_MCP::pin_read(byte pinNum) {
 
 void Keypad_MCP::port_write( byte i2cportval ) {
 // MCP23008 requires a register address on each write
-	TwoWire::beginTransmission((int)i2caddr);
-	TwoWire::write( GPIO );
-	TwoWire::write( i2cportval );
-	TwoWire::endTransmission();
+	_wire->beginTransmission((int)i2caddr);
+	_wire->write( GPIO );
+	_wire->write( i2cportval );
+	_wire->endTransmission();
 	pinState = i2cportval;
 } // port_write( )
 
 byte Keypad_MCP::pinState_set( ) {
-	TwoWire::requestFrom( (int)i2caddr, 1 );
-	pinState = TwoWire::read( );
+	_wire->requestFrom( (int)i2caddr, 1 );
+	pinState = _wire->read( );
 	return pinState;
 } // set_pinState( )
 
@@ -165,18 +175,20 @@ byte Keypad_MCP::iodir_read( ) {
 
 void Keypad_MCP::iodir_write( byte iodir ) {
 	iodir_state = iodir;
-	TwoWire::beginTransmission((int)i2caddr);   // read current IODIR reg 
-	TwoWire::write( IODIR );
-	TwoWire::write( iodir_state );
-	TwoWire::endTransmission();
-	TwoWire::beginTransmission((int)i2caddr);	// reset adr pointer to gpio
-	TwoWire::write( GPIO );
-	TwoWire::endTransmission();
+	_wire->beginTransmission((int)i2caddr);   // read current IODIR reg 
+	_wire->write( IODIR );
+	_wire->write( iodir_state );
+	_wire->endTransmission();
+	_wire->beginTransmission((int)i2caddr);	// reset adr pointer to gpio
+	_wire->write( GPIO );
+	_wire->endTransmission();
 } // iodir_write( )
 
 
 /*
 || @changelog
+|| |
+|| | 2.0 2020-04-10 - Joe Young : Fix compile err, add optional Wire param in constructor
 || |
 || | 1.0 2012-07-29 - Joe Young : Initial Release
 || #

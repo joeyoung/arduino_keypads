@@ -1,6 +1,7 @@
 /*
 ||
 || @file Keypad_MCP.h
+|| @version 2.0
 || @version 1.0
 || @author G. D. (Joe) Young
 || @contact "G. D. (Joe) Young" <gdyoung@telus.net>
@@ -12,11 +13,18 @@
 || | defined keymaps.
 || #
 ||
+|| @version 2.0 - April 5, 2020
+|| | MKRZERO, ESP32 compile error from inheriting TwoWire that was OK with
+|| | original ATMEGA boards; possibly because newer processors can have
+|| | multiple I2C WireX ports. Consequently, added the ability to specify
+|| | an alternate Wire as optional parameter in constructor.
+|| #
+||
 || @license
 || | This library is free software; you can redistribute it and/or
 || | modify it under the terms of the GNU Lesser General Public
 || | License as published by the Free Software Foundation; version
-|| | 2.1 of the License.
+|| | 2.1 of the License or any later version.
 || |
 || | This library is distributed in the hope that it will be useful,
 || | but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,8 +32,8 @@
 || | Lesser General Public License for more details.
 || |
 || | You should have received a copy of the GNU Lesser General Public
-|| | License along with this library; if not, write to the Free Software
-|| | Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+|| | License along with this library; if not, see 
+|| | <https://www.gnu.org/licenses/> 
 || #
 ||
 */
@@ -37,19 +45,17 @@
 //#include "../Wire/Wire.h"
 #include "Wire.h"
 
-class Keypad_MCP : public Keypad, public TwoWire {
+class Keypad_MCP : public Keypad {
 public:
-	Keypad_MCP(char* userKeymap, byte* row, byte* col, byte numRows, byte numCols, byte address) :
-		Keypad(userKeymap, row, col, numRows, numCols) { i2caddr = address; }
+	Keypad_MCP(char* userKeymap, byte* row, byte* col, byte numRows, byte numCols,
+               byte address, TwoWire * awire=&Wire ) 
+		       : Keypad(userKeymap, row, col, numRows, numCols) { i2caddr = address; _wire = awire; }
 
 	// Keypad function
 	void begin(char *userKeymap);
 	// Wire function
 	void begin(void);
 	// Wire function
-	void begin(byte address);
-	// Wire function
-	void begin(int address);
 
 	void pin_mode(byte pinNum, byte mode);
 	void pin_write(byte pinNum, boolean level);
@@ -71,6 +77,7 @@ private:
 	// MCP setup
 	byte iodir_state;    // copy of IODIR register
 	void _begin( void );
+	TwoWire * _wire;
 };
 
 
@@ -79,6 +86,8 @@ private:
 /*
 || @changelog
 || |
+|| | 2.0 2020-04-10 - Joe Young : fix compile err on MKR from importing TwoWire in constructor
+|| |                              add optional specification of Wire port for newer boards
 || | 1.0 2012-07-29 - Joe Young : Initial Release
 || #
 */
