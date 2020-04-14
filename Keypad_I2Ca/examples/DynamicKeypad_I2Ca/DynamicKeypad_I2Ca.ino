@@ -80,6 +80,8 @@
 || #
 
      Modified to use I2C i/o G. D. (Joe) Young - Feb 28/12
+     Revise to illustrate pin share on unused i2c port pin, save ddr state around using
+     keypad.begin( ) to select alternate keypad. GDY - April 14, 2020
 */
 #include <Keypad_I2Ca.h>
 #include <Keypad.h>
@@ -116,7 +118,8 @@ byte colPins[COLS] = {12, 14, 10}; 	//connect to the column pinouts of the keypa
 Keypad_I2Ca keypad(keypadMap,rowPins,colPins,sizeof(rowPins),sizeof(colPins),I2CADDR, PCA9539 );
 
 unsigned long startTime;
-const byte ledPin = 13;	                                                 // Use the LED on pin 13.
+const byte ledPin = 13;	                     // Use the LED on pin 13.
+const byte i2cledPin = 15;                   // for LED on unused i2c port pin
 
 void setup() {
     Serial.begin(9600);
@@ -124,17 +127,20 @@ void setup() {
     Wire.begin( );
     keypad.begin( );
     pinMode(ledPin, OUTPUT);
-    digitalWrite(ledPin, LOW);                                                // Turns the LED on.
-    keypad.addEventListener(keypadEvent);                                      // Add an event listener.
-    keypad.setHoldTime(500);                                                   // Default is 1000mS
+    digitalWrite(ledPin, LOW);               // Turns the LED off.
+    keypad.pin_mode( i2cledPin, OUTPUT );    // setup for unused port pin flasher
+    keypad.pin_write( i2cledPin, LOW );
+    keypad.addEventListener(keypadEvent);    // Add an event listener.
+    keypad.setHoldTime(500);                 // Default is 1000mS
 }
 
 void loop() {
     char key = keypad.getKey();
 
     if (alpha && millis()-startTime>100) {           // Flash the LED if we are using the letter keymap.
-        digitalWrite(ledPin,!digitalRead(ledPin));
-		startTime = millis();
+      digitalWrite(ledPin,!digitalRead(ledPin));
+      keypad.pin_write( i2cledPin, !keypad.pin_read( i2cledPin ) );  // also on i2c port pin
+		  startTime = millis();
     }
 }
 
@@ -172,12 +178,17 @@ void keypadEvent(KeypadEvent key) {
     case HOLD:
         if (key == '#')  {                   // Toggle between keymaps.
             if (alpha == true)  {            // We are currently using a keymap with letters
+                word saveDDR = keypad.iodir_read( ); // begin loses current ddr state
                 keypad.begin(*numberKeys);   // and want to change to numbers.
+                keypad.iodir_write( saveDDR );
                 alpha = false;
                 digitalWrite(ledPin, LOW);
+                keypad.pin_write( i2cledPin, LOW );
             }
             else  {                          // Or, we are currently using a keymap with numbers
+                word saveDDR = keypad.iodir_read( ); // begin loses current ddr state
                 keypad.begin(*alphaKeys);    // and want to change to letters.
+                keypad.iodir_write( saveDDR );
                 alpha = true;
             }
         }
