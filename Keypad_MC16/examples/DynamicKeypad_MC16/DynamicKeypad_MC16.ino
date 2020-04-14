@@ -80,20 +80,15 @@
 || #
 
      Modified to use I2C i/o G. D. (Joe) Young - Feb 28/12
-     
-     Modified to use Microchip MCP23008 I2C port (via Keypad_MCP
-     library package) G. D. (Joe) Young - July 29/12
-     
-     Modified to use Microchip MCP23016 I2C port (via Keypad_MC16 
-     library package) G. D. (Joe) Young - Feb 2/13
-     
+     Revised toggling LED example implementation, state save around keypad.begin( alternat kpd)
+     because begin resets port to power-on state. April 14/2020
 */
 #include <Keypad_MC16.h>
 #include <Keypad.h>
 #include <ctype.h>
 #include <Wire.h>
 
-#define I2CADDR 0x20
+#define I2CADDR 0x26
 
 const byte ROWS = 4; //four rows
 const byte COLS = 3; //three columns
@@ -115,82 +110,69 @@ char numberKeys[ROWS][COLS] = {
 boolean alpha = false;   // Start with the numeric keypad.
 char* keypadMap = (alpha == true) ? makeKeymap(alphaKeys) : makeKeymap(numberKeys);
 
+//no name keypad pins
 byte rowPins[ROWS] = {0, 1, 2, 3}; 	//connect to the row pinouts of the keypad
-byte colPins[COLS] = {7, 8, 9}; 	//connect to the column pinouts of the keypad
+byte colPins[COLS] = {4, 5, 6}; 	//connect to the column pinouts of the keypad
 
 //create a new Keypad
-//Keypad_I2C keypad = Keypad_I2C(keypadMap, rowPins, colPins, sizeof(rowPins), sizeof(colPins), I2CADDR);
-Keypad_MC16 numpad( makeKeymap(numberKeys), rowPins, colPins, sizeof(rowPins), sizeof(colPins), I2CADDR );
-Keypad_MC16 ltrpad( makeKeymap(alphaKeys), rowPins, colPins, sizeof(rowPins), sizeof(colPins), I2CADDR );
-Keypad_MC16 keypad = numpad;
+Keypad_MC16 keypad(keypadMap,rowPins,colPins,sizeof(rowPins),sizeof(colPins),I2CADDR );
 
 unsigned long startTime;
 const byte ledPin = 13;	                                                 // Use the LED on pin 13.
 
-void setup() {
-    Serial.begin(9600);
-    numpad.begin( );
-    ltrpad.begin( );
-    numpad.port_write( 0xff );
-    ltrpad.port_write( 0xff );
-    numpad.iodir_write( numpad.iodir_read( ) & 0b01111111 );  // msb output for led
-    ltrpad.iodir_write( ltrpad.iodir_read( ) & 0b01111111 );  // msb output for led
-    pinMode(ledPin, OUTPUT);
-    digitalWrite(ledPin, LOW);                      // Turns the LED on.
-    ltrpad.addEventListener(keypadEvent_ltr);       // Add an event listener.
-    ltrpad.setHoldTime(500);                        // Default is 1000mS
-    numpad.addEventListener(keypadEvent_num);       // Add an event listener.
-    numpad.setHoldTime(500);                        // Default is 1000mS
-}
+word portState;
+const word i2cledPin = 0x0080;  // msb of gp0 output for led
+const byte i2cLedPin = 7;       // as a bit number     keypad.pin_write( i2cLedPin, !keypad.pin_read( i2cLedPin ) );
 
-byte portState;
-const byte i2cledPin = 0b10000000;  // msb output for led
 
-void toggleLED( void ) {
-  portState = ltrpad.pinState_set( );
+#if 0
+void toggleLED( void ) {                // 'how to use' document example
+  portState = keypad.pinState_set( );
   if( portState & i2cledPin ) portState &= ~i2cledPin; 
   else portState |= i2cledPin;  
-  ltrpad.port_write( portState );
+  keypad.port_write( portState );
 }// toggleLED on i2c spare pin
+#endif
 
-char key;
+void toggleLED( void ) {                 // simpler method
+  keypad.pin_write( i2cLedPin, !keypad.pin_read( i2cLedPin ) );
+//  if( keypad.pin_read( 7 ) == 1 ) keypad.pin_write( 7, 0 ); 
+//    else keypad.pin_write( 7, 1 );
+}
+
+void setup() {
+    Serial.begin(9600);
+    while( !Serial ){ /*wait*/ }
+    Wire.begin( );
+    keypad.begin( );
+    keypad.port_write( 0xffff );    // as if all inputs have pullups
+    pinMode(ledPin, OUTPUT);
+    digitalWrite(ledPin, LOW);                            // Turns the LED off.
+    keypad.pin_mode( i2cLedPin, OUTPUT );                 // ready i2c port LED
+    keypad.pin_write( i2cLedPin, LOW );
+    keypad.addEventListener(keypadEvent);                 // Add an event listener.
+    keypad.setHoldTime(500);                              // Default is 1000mS
+}
 
 void loop() {
-
-  if( alpha ) key = ltrpad.getKey( ); else key = numpad.getKey( );
+    char key = keypad.getKey();
 
     if (alpha && millis()-startTime>100) {           // Flash the LED if we are using the letter keymap.
-      digitalWrite(ledPin,!digitalRead(ledPin));
-      toggleLED( );
-      startTime = millis();
+        digitalWrite(ledPin,!digitalRead(ledPin));
+        toggleLED( );
+		startTime = millis();
     }
 }
 
-static char virtKey = NO_KEY;      // Stores the last virtual key press. (Alpha keys only)
-static char physKey = NO_KEY;      // Stores the last physical key press. (Alpha keys only)
-static char buildStr[12];
-static byte buildCount;
-static byte pressCount;
-
-static byte kpadState;
-
 // Take care of some special events.
+void keypadEvent(KeypadEvent key) {
+    static char virtKey = NO_KEY;      // Stores the last virtual key press. (Alpha keys only)
+    static char physKey = NO_KEY;      // Stores the last physical key press. (Alpha keys only)
+    static char buildStr[12];
+    static byte buildCount;
+    static byte pressCount;
 
-void keypadEvent_ltr(KeypadEvent key) {
-// in here when in alpha mode.
-  kpadState = ltrpad.getState( );
-  swOnState( key );
-} // end ltrs keypad events
-    
-void keypadEvent_num( KeypadEvent key ) {
-// in here when using number keypad
-  kpadState = numpad.getState( );
-  swOnState( key );
-} // end numbers keypad events
-
-void swOnState( char key ) {
-  
-    switch( kpadState )
+    switch (keypad.getState())
     {
     case PRESSED:
         if (isalpha(key)) {              // This is a letter key so we're using the letter keymap.
@@ -216,12 +198,17 @@ void swOnState( char key ) {
     case HOLD:
         if (key == '#')  {                   // Toggle between keymaps.
             if (alpha == true)  {            // We are currently using a keymap with letters
- //               keypad.begin(*numberKeys);   // and want to change to numbers.
+                word saveDDR = keypad.iodir_read( );    //begin resets ddr
+                keypad.begin(*numberKeys);   // and want to change to numbers.
+                keypad.iodir_write( saveDDR );
                 alpha = false;
                 digitalWrite(ledPin, LOW);
+                keypad.pin_write( i2cLedPin, LOW );
             }
             else  {                          // Or, we are currently using a keymap with numbers
- //               keypad.begin(*alphaKeys);    // and want to change to letters.
+                word saveDDR = keypad.iodir_read( );    //begin resets ddr
+                keypad.begin(*alphaKeys);    // and want to change to letters.
+                keypad.iodir_write( saveDDR );
                 alpha = true;
             }
         }
@@ -238,5 +225,4 @@ void swOnState( char key ) {
         break;
 
     }  // end switch-case
-}// end switch on state function
-
+}  // end keypad events

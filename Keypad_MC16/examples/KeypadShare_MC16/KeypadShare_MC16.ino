@@ -12,7 +12,7 @@
 #include <Keypad_MC16.h>
 #include <Keypad.h>
 
-#define I2CADDR 0x20
+#define I2CADDR 0x26
 
 const byte ROWS = 4; //four rows
 const byte COLS = 3; //three columns
@@ -35,6 +35,7 @@ word portState;   // copy of I2C port word
 
 void setup( ){
   Serial.begin( 9600 );
+  Wire.begin( );
   kpd.begin( );  // also starts Wire
   kpd.iodir_write( kpd.iodir_read( ) & 0xff7f );  // make bit an output
   portState = kpd.pinState_set( );

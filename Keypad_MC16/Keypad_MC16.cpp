@@ -1,9 +1,10 @@
 /*
 ||
 || @file Keypad_MC16.h
+|| @version 2.0
 || @version 1.0
 || @author G. D. (Joe) Young
-|| @contact "G. D. (Joe) Young" <gdyoung@telus.net>
+|| @contact "G. D. (Joe) Young" <jyoung@islandnet.com>
 ||
 || @description
 || | Keypad_MC16 provides an interface for using matrix keypads that
@@ -12,11 +13,18 @@
 || | defined keymaps.
 || #
 ||
+|| @version 2.0 - April 5, 2020
+|| | MKRZERO, ESP32 compile error from inheriting TwoWire that was OK with
+|| | original ATMEGA boards; possibly because newer processors can have
+|| | multiple I2C WireX ports. Consequently, added the ability to specify
+|| | an alternate Wire as optional parameter in constructor.
+|| #
+||
 || @license
 || | This library is free software; you can redistribute it and/or
 || | modify it under the terms of the GNU Lesser General Public
 || | License as published by the Free Software Foundation; version
-|| | 2.1 of the License.
+|| | 2.1 of the License or any later version.
 || |
 || | This library is distributed in the hope that it will be useful,
 || | but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,8 +32,8 @@
 || | Lesser General Public License for more details.
 || |
 || | You should have received a copy of the GNU Lesser General Public
-|| | License along with this library; if not, write to the Free Software
-|| | Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+|| | License along with this library; if not, see 
+|| | <https://www.gnu.org/licenses/> 
 || #
 ||
 */
@@ -44,7 +52,7 @@
 
 // Let the user define a keymap - assume the same row/column count as defined in constructor
 void Keypad_MC16::begin(char *userKeymap) {
-	TwoWire::begin();
+//	_wire->begin();
     Keypad::begin(userKeymap);
 	_begin( );
 	pinState = pinState_set( );
@@ -55,28 +63,12 @@ void Keypad_MC16::begin(char *userKeymap) {
 
 // Initialize MC16
 void Keypad_MC16::begin(void) {
-	TwoWire::begin();
+//	_wire->begin();
 	_begin( );
 //	pinState = 0xff;
 	pinState = pinState_set( );
 }
 
-// Initialize MC16
-void Keypad_MC16::begin(byte address) {
-	i2caddr = address;
-	TwoWire::begin(address);
-	_begin( );
-//	pinState = 0xff;
-	pinState = pinState_set( );
-}
-
-void Keypad_MC16::begin(int address) {
-	i2caddr = address;
-	TwoWire::begin(address);
-	_begin( );
-//	pinState = 0xff;
-	pinState = pinState_set( );
-} // begin( int )
 
 word iodirec = 0xffff;            //direction of each bit - reset state = all inputs.
 byte iocon = 0x01;                // fast mode
@@ -86,20 +78,20 @@ byte iocon = 0x01;                // fast mode
 
 void Keypad_MC16::_begin( void ) {
 	iodir_state = iodirec;
-	TwoWire::beginTransmission( (int)i2caddr );
-	TwoWire::write( IOCON0 ); // set fast mode
-	TwoWire::write( iocon );
-	TwoWire::endTransmission( );
-	TwoWire::beginTransmission( (int)i2caddr );
-	TwoWire::write( IODIR0 ); // setup port direction - all inputs to start
-	TwoWire::write( lowByte( iodirec ) );
-	TwoWire::write( highByte( iodirec ) );
-	TwoWire::endTransmission( );
-	TwoWire::beginTransmission( (int)i2caddr );
-	TwoWire::write( GP0 );	//point register pointer to gpio reg
-	TwoWire::write( lowByte(iodirec) ); // make o/p latch agree with pulled-up pins
-	TwoWire::write( highByte(iodirec) );
-	TwoWire::endTransmission( );
+	_wire->beginTransmission( (int)i2caddr );
+	_wire->write( IOCON0 ); // set fast mode
+	_wire->write( iocon );
+	_wire->endTransmission( );
+	_wire->beginTransmission( (int)i2caddr );
+	_wire->write( IODIR0 ); // setup port direction - all inputs to start
+	_wire->write( lowByte( iodirec ) );
+	_wire->write( highByte( iodirec ) );
+	_wire->endTransmission( );
+	_wire->beginTransmission( (int)i2caddr );
+	_wire->write( GP0 );	//point register pointer to gpio reg
+	_wire->write( lowByte(iodirec) ); // make o/p latch agree with pulled-up pins
+	_wire->write( highByte(iodirec) );
+	_wire->endTransmission( );
 } // _begin( )
 
 // individual pin setup - modify pin bit in IODIR reg.
@@ -110,14 +102,14 @@ void Keypad_MC16::pin_mode(byte pinNum, byte mode) {
 	} else {
 		iodir_state |= mask;
 	} // if mode
-	TwoWire::beginTransmission((int)i2caddr);
-	TwoWire::write( IODIR0 );
-	TwoWire::write( lowByte( iodir_state ) );
-	TwoWire::write( highByte( iodir_state ) );
-	TwoWire::endTransmission();
-	TwoWire::beginTransmission((int)i2caddr);	// reset adr pointer to gpio
-	TwoWire::write( GP0 );
-	TwoWire::endTransmission();
+	_wire->beginTransmission((int)i2caddr);
+	_wire->write( IODIR0 );
+	_wire->write( lowByte( iodir_state ) );
+	_wire->write( highByte( iodir_state ) );
+	_wire->endTransmission();
+	_wire->beginTransmission((int)i2caddr);	// reset adr pointer to gpio
+	_wire->write( GP0 );
+	_wire->endTransmission();
 } // pin_mode( )
 
 void Keypad_MC16::pin_write(byte pinNum, boolean level) {
@@ -133,9 +125,9 @@ void Keypad_MC16::pin_write(byte pinNum, boolean level) {
 
 int Keypad_MC16::pin_read(byte pinNum) {
 	word mask = 0x1<<pinNum;
-	TwoWire::requestFrom((int)i2caddr, 2);
-	word pinVal = TwoWire::read( );
-	pinVal |= ( TwoWire::read( )<<8 );
+	_wire->requestFrom((int)i2caddr, 2);
+	word pinVal = _wire->read( );
+	pinVal |= ( _wire->read( )<<8 );
 	pinVal &= mask;
 	if( pinVal == mask ) {
 		return 1;
@@ -146,22 +138,22 @@ int Keypad_MC16::pin_read(byte pinNum) {
 
 void Keypad_MC16::port_write( word i2cportval ) {
 // MCP23016 requires a register address on each write
-	TwoWire::beginTransmission((int)i2caddr);
-	TwoWire::write( GP0 );
-	TwoWire::write( lowByte( i2cportval ) );
-	TwoWire::write( highByte( i2cportval ) );
-	TwoWire::endTransmission();
+	_wire->beginTransmission((int)i2caddr);
+	_wire->write( GP0 );
+	_wire->write( lowByte( i2cportval ) );
+	_wire->write( highByte( i2cportval ) );
+	_wire->endTransmission();
 	pinState = i2cportval;
 } // port_write( )
 
 word Keypad_MC16::pinState_set( ) {
-	TwoWire::beginTransmission((int)i2caddr);
-	TwoWire::write( GP0 );
-	TwoWire::endTransmission( );
-	TwoWire::requestFrom( (int)i2caddr, 2 );
+	_wire->beginTransmission((int)i2caddr);
+	_wire->write( GP0 );
+	_wire->endTransmission( );
+	_wire->requestFrom( (int)i2caddr, 2 );
 	pinState = 0;
-	pinState = TwoWire::read( );
-	pinState |= (TwoWire::read( )<<8);
+	pinState = _wire->read( );
+	pinState |= (_wire->read( )<<8);
 	return pinState;
 } // set_pinState( )
 
@@ -172,19 +164,21 @@ word Keypad_MC16::iodir_read( ) {
 
 void Keypad_MC16::iodir_write( word iodir ) {
 	iodir_state = iodir;
-	TwoWire::beginTransmission((int)i2caddr);   // read current IODIR reg 
-	TwoWire::write( IODIR0 );
-	TwoWire::write( lowByte( iodir_state ) );
-	TwoWire::write( highByte( iodir_state ) );
-	TwoWire::endTransmission();
-	TwoWire::beginTransmission((int)i2caddr);	// reset adr pointer to gpio
-	TwoWire::write( GP0 );
-	TwoWire::endTransmission();
+	_wire->beginTransmission((int)i2caddr);   // read current IODIR reg 
+	_wire->write( IODIR0 );
+	_wire->write( lowByte( iodir_state ) );
+	_wire->write( highByte( iodir_state ) );
+	_wire->endTransmission();
+	_wire->beginTransmission((int)i2caddr);	// reset adr pointer to gpio
+	_wire->write( GP0 );
+	_wire->endTransmission();
 } // iodir_write( )
 
 
 /*
 || @changelog
+|| |
+|| | 2.0 2020-04-11 - Joe Young : Fix MKR compile err, add optional Wire param in constructor
 || |
 || | 1.0 2013-01-25 - Joe Young : Derived from Keypad_MCP
 || #
