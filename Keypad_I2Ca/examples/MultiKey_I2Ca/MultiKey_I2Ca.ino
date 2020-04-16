@@ -1,5 +1,7 @@
-/* Multikey_MC16 - 16-bit I2C port conversion of Keypad's Multikey
+/* Multikey_I2Ca - 16-bit I2C port conversion of Keypad's Multikey
 :: G. D. (Joe) Young Feb 12, 2013
+::
+:: April 16/20 - from Multikey_MC16, testing revised I2C libraries
 ::
 || @file MultiKey.ino
 || @version 1.0
@@ -15,10 +17,10 @@
 */
 
 #include <Keypad.h>
-#include <Keypad_MC16.h>    // I2C i/o library for Keypad
+#include <Keypad_I2Ca.h>    // I2C i/o library for Keypad
 #include <Wire.h>           // I2C library for Keypad_MC16
 
-#define I2CADDR 0x26        // address of MCP23016 chip on I2C bus
+#define I2CADDR 0x77        // address of PCA9539 chip on I2C bus
 
 const byte ROWS = 4; //four rows
 const byte COLS = 3; //three columns
@@ -28,19 +30,19 @@ char keys[ROWS][COLS] = {
   {'7','8','9'},
   {'*','0','#'}
 };
-byte rowPins[ROWS] = {0, 1, 2, 3}; //connect to the row pinouts of the kpd
-byte colPins[COLS] = {4, 5, 6}; //connect to the column pinouts of the kpd
+byte rowPins[ROWS] = {13, 8, 9, 11}; //connect to the row pinouts of the kpd
+byte colPins[COLS] = {12, 14, 10}; //connect to the column pinouts of the kpd
 
 // modify constructor for I2C i/o
-Keypad_MC16 kpd = Keypad_MC16( makeKeymap(keys), rowPins, colPins, ROWS, COLS, I2CADDR );
+Keypad_I2Ca kpd( makeKeymap(keys), rowPins, colPins, ROWS, COLS, I2CADDR, PCA9539 );
 
 
 
 void setup() {
   Serial.begin(9600);
-  while( !Serial ){/*wait*/}
+  while( !Serial ){/*wait*/} // for USB-switching serial ports (MKR, ESP32, ? )
   Wire.begin( );
-  kpd.begin( );            // also starts wire library
+  kpd.begin( );            // does not start wire library
   kpd.setDebounceTime(1);
 }
 
