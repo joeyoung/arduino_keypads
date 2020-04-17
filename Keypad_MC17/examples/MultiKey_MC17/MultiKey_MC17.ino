@@ -19,7 +19,7 @@
 #include <Keypad_MC17.h>    // I2C i/o library for Keypad
 #include <Wire.h>           // I2C library for Keypad_MC17
 
-#define I2CADDR 0x24        // address of MCP23017 chip on I2C bus
+#define I2CADDR 0x25        // address of MCP23017 chip on I2C bus
 
 const byte ROWS = 4; //four rows
 const byte COLS = 3; //three columns
@@ -30,16 +30,18 @@ char keys[ROWS][COLS] = {
   {'*','0','#'}
 };
 byte rowPins[ROWS] = {0, 1, 2, 3}; //connect to the row pinouts of the kpd
-byte colPins[COLS] = {4, 5, 6}; //connect to the column pinouts of the kpd
+byte colPins[COLS] = {8,9,10}; //connect to the column pinouts of the kpd
 
 // modify constructor for I2C i/o
-Keypad_MC17 kpd = Keypad_MC17( makeKeymap(keys), rowPins, colPins, ROWS, COLS, I2CADDR );
+Keypad_MC17 kpd( makeKeymap(keys), rowPins, colPins, ROWS, COLS, I2CADDR );
 
 
 
 void setup() {
   Serial.begin(9600);
-  kpd.begin( );            // also starts wire library
+  while( !Serial ){/*wait*/}   //for USB serial switching boards
+  Wire.begin( );
+  kpd.begin( );                // now does not starts wire library
   kpd.setDebounceTime(1);
 }
 

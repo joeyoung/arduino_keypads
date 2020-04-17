@@ -9,6 +9,7 @@
    Modified for Keypad_MCP G. D. (Joe) Young July 29/12
    Modified for Keypad_MC16 G. D. (Joe) Young Jan 26/13
    Modified for Keypad_MC17 G. D. (Joe) Young May 18/14
+   Check with revised library, MKR board GDY Apr 17/20
 */
 #include <Keypad_MC17.h>
 #include <Wire.h>
@@ -31,6 +32,8 @@ Keypad_MC17 keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS, I2CADDR );
 
 void setup(){
   Serial.begin(9600);
+  while( !Serial ){/*wait*/}       // for USB serial switching boards (MKR)
+  Wire.begin( );                   // now needed
   keypad.begin( );
 }
   
