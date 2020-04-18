@@ -20,7 +20,7 @@
 || |    it's not really one of the concepts that I wanted to show you.  If you look
 || |    at the code in the PRESSED event you will see that the first section of that
 || |    code is used to scroll through three different letters on each key.  For 
-|| |    example, pressing the '2' key will step through the letters 'd', 'e' and 'f'.
+|| |  --  example, pressing the '2' key will step through the letters 'd', 'e' and 'f'.
 || |
 || |
 || |  Using the keypad events, PRESSED, HOLD and RELEASED to simplify coding
@@ -89,6 +89,8 @@
      
      Modified to use Microchip MCP23017 I2C port (via Keypad_MC17 
      library package) G. D. (Joe) Young - Feb 2/13
+
+     check against revised library GDY - April 17/20
      
 */
 #include <Keypad_MC17.h>
@@ -132,6 +134,8 @@ const byte ledPin = 13;	       // Use the LED on pin 13.
 
 void setup() {
     Serial.begin(9600);
+    while( !Serial ){/*wait*/}      // for USB serial switchers (MKR)
+    Wire.begin( );                  // now needed
     numpad.begin( );
     ltrpad.begin( );
     numpad.port_write( 0xff );
@@ -242,4 +246,3 @@ void swOnState( char key ) {
 
     }  // end switch-case
 }// end switch on state function
-
