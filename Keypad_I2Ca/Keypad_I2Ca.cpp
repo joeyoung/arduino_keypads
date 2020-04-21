@@ -1,11 +1,11 @@
 /*
 ||
-|| @file Keypad_I2Ca.h
+|| @file Keypad_I2Ca.cpp
 || @version 4.0 - fix compile error, allow WireX in constructor
 || @version 3.0 - PCA9554, PCA9554A, PCA9555 support G. D. Young
 || @version 2.0 - PCF8575 support added by Paul Williamson
 || @author G. D. (Joe) Young, ptw
-|| @contact "G. D. (Joe) Young" <gdyoung@telus.net>
+|| @contact "G. D. (Joe) Young" <jyoung@islandnet.com>
 ||
 || @description
 || | Keypad_I2Ca provides an interface for using matrix keypads that

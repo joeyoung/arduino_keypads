@@ -4,7 +4,7 @@
 || @version 2.0
 || @version 1.0
 || @author G. D. (Joe) Young
-|| @contact "G. D. (Joe) Young" <gdyoung@telus.net>
+|| @contact "G. D. (Joe) Young" <jyoung@islandnet.com>
 ||
 || @description
 || | Keypad_MCP provides an interface for using matrix keypads that

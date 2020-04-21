@@ -4,7 +4,7 @@
 || @version 1.0 - Convert Keypad_I2C to use TinyWireM library for ATtiny micros
 || @version 2.0 - PCF8575 support added by Paul Williamson
 || @author G. D. (Joe) Young, ptw
-|| @contact "G. D. (Joe) Young" <gdyoung@islandnet.com>
+|| @contact "G. D. (Joe) Young" <jyoung@islandnet.com>
 ||
 || @description
 || | Keypad_tw provides an interface for using matrix keypads that

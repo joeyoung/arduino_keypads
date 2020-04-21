@@ -1,6 +1,6 @@
 /*
 ||
-|| @file Keypad_I2C.h
+|| @file Keypad_I2C.cpp
 || @version 3.0 - multiple WireX support
 || @version 2.0 - PCF8575 support added by Paul Williamson
 || @author G. D. (Joe) Young, ptw

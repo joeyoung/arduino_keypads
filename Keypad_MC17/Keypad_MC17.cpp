@@ -1,9 +1,9 @@
 /*
 ||
-|| @file Keypad_MC17.h
+|| @file Keypad_MC17.cpp
 || @version 2.0
 || @author G. D. (Joe) Young
-|| @contact "G. D. (Joe) Young" <gdyoung@telus.net>
+|| @contact "G. D. (Joe) Young" <jyoung@islandnet.com>
 ||
 || @description
 || | Keypad_MC17 provides an interface for using matrix keypads that
