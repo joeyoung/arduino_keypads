@@ -42,13 +42,13 @@
 // Let the user define a keymap - assume the same row/column count as defined in constructor
 void Keypad_I2C::begin(char *userKeymap) {
     Keypad::begin(userKeymap);
-	port_write( 0xff );			//set to power-up state
+	port_write( 0xffff );			//set to power-up state
 	pinState = pinState_set( );
 }
 
 // Initialize I2C
 void Keypad_I2C::begin(void) {
-	port_write( 0xff );			//set to power-up state
+	port_write( 0xffff );			//set to power-up state
 	pinState = pinState_set( );
 }
 
