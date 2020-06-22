@@ -30,7 +30,7 @@ byte colPins[COLS] = {7, 6, 5, 4}; //connect to the column pinouts of the keypad
 Keypad_I2C customKeypad( makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS, I2CADDR); 
 
 void setup(){
-//  Wire.begin( );
+  Wire.begin( );                // GDY200622
   customKeypad.begin( );        // GDY120705
   Serial.begin(9600);
 }
