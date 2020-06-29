@@ -9,9 +9,9 @@ port chips:
 
  * `Keypad_I2`C - PCF8574, PCF8574A and PCF8575
  * `Keypad_I2Ca` - PCA9554, PCA9555, PCA9534, PCA9535, PCA9539, PCA6408, PCA6416
- * `Keypad_MC16` - MCP230016
- * `Keypad_MCP` - MCP230008
- * `Keypad_MC17` - MCP230017
+ * `Keypad_MC16` - MCP23016
+ * `Keypad_MCP` - MCP23008
+ * `Keypad_MC17` - MCP23017
  * `Keypad_tw`  - PCF8574, PCF8575 using the TinyWire lib on atTiny processors
  
  The reason for separate libraries for each sort of expansion port IC is that their
