@@ -35,4 +35,7 @@ port chips:
  
  An interesting use of `Keypad's` features enables decoding of quadrature encoders--see
  the examples `KeypadEnc`, and `KeypadEnc_I2C` in the `Keypad_I2C` library.
+
+The folder `scadKeypadLabel` has a simple scad script for creating keypad overlays.
+ 
  
