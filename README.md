@@ -7,7 +7,7 @@ port on the arduino microprocessor.
 The separate libraries each handle the I/O needed by Keypad for different expansion
 port chips:
 
- * `Keypad_I2`C - PCF8574, PCF8574A and PCF8575
+ * `Keypad_I2C` - PCF8574, PCF8574A and PCF8575
  * `Keypad_I2Ca` - PCA9554, PCA9555, PCA9534, PCA9535, PCA9539, PCA6408, PCA6416
  * `Keypad_MC16` - MCP23016
  * `Keypad_MCP` - MCP23008
