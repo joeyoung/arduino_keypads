@@ -1,0 +1,42 @@
+###########################################
+# Syntax Coloring Map For Keypad_MCS17
+###########################################
+
+###########################################
+# Datatypes (KEYWORD1)
+###########################################
+
+Keypad_MCS17	KEYWORD1
+
+
+###########################################
+# Keypad_MCS17 Library constants
+###########################################
+
+MCP23S17	LITERAL1
+
+
+###########################################
+# Methods and Functions (KEYWORD2)
+###########################################
+
+pinState_set	KEYWORD2
+pin_mode	KEYWORD2
+pin_read	KEYWORD2
+pin_write	KEYWORD2
+port_write	KEYWORD2
+iodir_read	KEYWORD2
+iodir_write	KEYWORD2
+begin	KEYWORD2
+
+
+###########################################
+# objects created in the example sketches.
+###########################################
+
+keypad	KEYWORD3
+keypad1	KEYWORD3
+keypad2	KEYWORD3
+keypad3	KEYWORD3
+keypad4	KEYWORD3
+

@@ -10,6 +10,7 @@ G. D. (Joe) Young, July 25, 2012
                    May 24, 2014 - add Keypad_I2Ca
                    May 27, 2014 - additional devices with Keypad_I2Ca
                    May 24, 2015 - Keypad_tw - TinyWireM version for PCF857xx
+                   Jan  3, 2025 - Keypad_MCS17 - SPI interface for MCP23S17
 
 keypadreadme - this file
 
@@ -31,6 +32,9 @@ folder Keypad_MC17- Joe Young. arduino library, extension of Keypad
 
 folder Keypad_tw  - Joe Young, arduino library, extension of Keypad
                     using PCF857xx I2C, port chips
+
+folder Keypad_MCS17 - Joe Young (and Alyx Vance) arduino library, 
+                    extension of Keypad using MCS2317 SPI port chip
 
 To use the Keypad_xxx libraries requires that the Keypad library be 
 present and its header <Keypad.h> be included within your sketch. 
@@ -78,6 +82,10 @@ the WireX to use for that Keypad_xxx object. The modified libraries may
 require slight variations in the setup() - need kpd.begin(), wait for
 serial for MKR. Some of the older examples have been left unchanged, see
 HelloKeypad_I2C for current setup().
+
+Jan 03, 2025 - As result of issue 18 request by Alyx Vance for a revision
+of the library for the MCP23017 I2C to use the faster SPI version of 
+the chip (MCP23S17), the library Keypad_MCS17 is released.
 
 I will be maintaining the I2C bus enhancements, possibly adding other 
 keypad interfaces, and the latest version(s) will be posted here on 
