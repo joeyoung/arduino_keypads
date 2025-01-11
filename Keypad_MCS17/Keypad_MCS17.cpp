@@ -56,7 +56,12 @@
 #define IOCON 0x0a		//MCP23S17 I/O configuration register
 #define GPPUA 0x0c		//MCP23S17 pullup resistors control
 
+
 /////// Extended Keypad library functions. ////////////////////////////
+
+void Keypad_MCS17::kpdSettings( SPISettings settings ){
+	kpd_settings = settings;
+}
 
 
 // Let the user define a keymap - assume the same row/column count as defined in constructor
@@ -81,8 +86,10 @@ byte iocon = 0x18;                //bank=0, disable slew control, enable hardwar
 
 void Keypad_MCS17::_begin( void ) {
 
+	kpd_settings = SPISettings(10000000, MSBFIRST, SPI_MODE0);
+
 //turn on hardware addressing of MCP23S17 - use pins 15,16,17 to select chip
-	_spi->beginTransaction(SPISettings(14000000, MSBFIRST, SPI_MODE0));
+	_spi->beginTransaction(kpd_settings);
 	digitalWrite( cs_port, LOW );
 	_spi->transfer( 0x40 | ( spichip<<1 ) );	//device opcode
 	_spi->transfer( IOCON );					//address of control reg
@@ -92,7 +99,7 @@ void Keypad_MCS17::_begin( void ) {
 
 //set initial port direction register for all inputs, enable pullups
 	iodir_state = iodirec;
-	_spi->beginTransaction(SPISettings(14000000, MSBFIRST, SPI_MODE0));
+	_spi->beginTransaction(kpd_settings);
 	digitalWrite( cs_port, LOW );
 	_spi->transfer( 0x40 | ( spichip<<1 ) );	//device opcode
 	_spi->transfer( GPPUA ); // enable pullups on all inputs
@@ -101,7 +108,7 @@ void Keypad_MCS17::_begin( void ) {
 	digitalWrite( cs_port, HIGH );
 	_spi->endTransaction( );
 
-	_spi->beginTransaction(SPISettings(14000000, MSBFIRST, SPI_MODE0));
+	_spi->beginTransaction(kpd_settings);
 	digitalWrite( cs_port, LOW );
 	_spi->transfer( 0x40 | ( spichip<<1 ) );	//device opcode
 	_spi->transfer( IODIRA ); // setup port direction - all inputs to start
@@ -110,7 +117,7 @@ void Keypad_MCS17::_begin( void ) {
 	digitalWrite( cs_port, HIGH );
 	_spi->endTransaction( );
 
-	_spi->beginTransaction(SPISettings(14000000, MSBFIRST, SPI_MODE0));
+	_spi->beginTransaction(kpd_settings);
 	digitalWrite( cs_port, LOW );
 	_spi->transfer( 0x40 | ( spichip<<1 ) );	//device opcode
 	_spi->transfer( GPIOA );	//point register pointer to gpio reg
@@ -129,7 +136,7 @@ void Keypad_MCS17::pin_mode(byte pinNum, byte mode) {
 	} else {
 		iodir_state |= mask;
 	} // if mode
-	_spi->beginTransaction(SPISettings(14000000, MSBFIRST, SPI_MODE0));
+	_spi->beginTransaction(kpd_settings);
 	digitalWrite( cs_port, LOW );
 	_spi->transfer( 0x40 | ( spichip<<1 ) );	//device opcode
 	_spi->transfer( IODIRA );
@@ -151,7 +158,7 @@ void Keypad_MCS17::pin_write(byte pinNum, boolean level) {
 
 
 int Keypad_MCS17::pin_read(byte pinNum) {
-	_spi->beginTransaction(SPISettings(14000000, MSBFIRST, SPI_MODE0));
+	_spi->beginTransaction(kpd_settings);
 	digitalWrite( cs_port, LOW );
 	_spi->transfer( 0x41 | ( spichip<<1 ) );	//device opcode (read)
 	_spi->transfer( GPIOA );
@@ -171,7 +178,7 @@ int Keypad_MCS17::pin_read(byte pinNum) {
 
 void Keypad_MCS17::port_write( word i2cportval ) {
 // MCP23S17 requires a register address on each write
-	_spi->beginTransaction(SPISettings(14000000, MSBFIRST, SPI_MODE0));
+	_spi->beginTransaction(kpd_settings);
 	digitalWrite( cs_port, LOW );
 	_spi->transfer( 0x40 | ( spichip<<1 ) );	//device opcode
 	_spi->transfer( GPIOA );
@@ -183,7 +190,7 @@ void Keypad_MCS17::port_write( word i2cportval ) {
 } // port_write( )
 
 word Keypad_MCS17::pinState_set( ) {
-	_spi->beginTransaction(SPISettings(14000000, MSBFIRST, SPI_MODE0));
+	_spi->beginTransaction(kpd_settings);
 	digitalWrite( cs_port, LOW );
 	_spi->transfer( 0x41 | ( spichip<<1 ) );	//device opcode (read)
 	_spi->transfer( GPIOA );
@@ -202,7 +209,7 @@ word Keypad_MCS17::iodir_read( ) {
 
 void Keypad_MCS17::iodir_write( word iodir ) {
 	iodir_state = iodir;
-	_spi->beginTransaction(SPISettings(14000000, MSBFIRST, SPI_MODE0));
+	_spi->beginTransaction(kpd_settings);
 	digitalWrite( cs_port, LOW );
 	_spi->transfer( 0x40 | ( spichip<<1 ) );	//device opcode
 	_spi->transfer( IODIRA );
@@ -216,6 +223,7 @@ void Keypad_MCS17::iodir_write( word iodir ) {
 /*
 || @changelog
 || |
+|| | 1.1 2025-01-08 - Joe Young : SPI MCP23S17 version plus kpdSettings( )
 || | 2.0 2020-04-05 - Joe Young : MKRZERO compile error, Wire spec'd in Constructor
 || | 1.0 2014-05-18 - Joe Young : Derived from Keypad_MC16
 || #

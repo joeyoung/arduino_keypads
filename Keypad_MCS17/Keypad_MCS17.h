@@ -1,7 +1,7 @@
 /*
 ||
 || @file Keypad_MCS17.h
-|| @version 1.0 SPI
+|| @version 1.1 SPI
 || @author G. D. (Joe) Young / SPI Alyx Vance
 || @contact "G. D. (Joe) Young" <jyoung@islandnet.com>
 ||
@@ -80,12 +80,15 @@ public:
 	word iodir_read( );
 	void iodir_write( word iodir );
 
+	void kpdSettings( SPISettings kpd_set );
+
 private:
     byte cs_port;
-    // I2C device address
+    // device hardware address
     byte spichip;
 	SPIClass *_spi;
-	// I2C pin_write state persistant storage
+	SPISettings kpd_settings;
+	// pin_write state persistant storage
 	word pinState;
 //	byte pin_iosetup( );
 	// MCS17 setup
@@ -98,6 +101,7 @@ private:
 
 /*
 || @changelog
+|| | 1.1 2025-01-08 - Joe Young : add kpdSettings( ) to allow changing default settings set in begin
 || | 1.0 2024-12-29 - Joe Young : set up as complete library package, use arduino SPI commands
 || | 1.0 SPI 2024-12-13 - Alyx Vance : Made as SPI version for MCP23S17
 || | 2.0 2020-04-05 - Joe Young : MKRZERO compile error, Wire spec'd in Constructor

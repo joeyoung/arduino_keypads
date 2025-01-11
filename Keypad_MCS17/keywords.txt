@@ -28,12 +28,14 @@ port_write	KEYWORD2
 iodir_read	KEYWORD2
 iodir_write	KEYWORD2
 begin	KEYWORD2
+kpdSettings	KEYWORD2
 
 
 ###########################################
 # objects created in the example sketches.
 ###########################################
 
+kpd	KEYWORD3
 keypad	KEYWORD3
 keypad1	KEYWORD3
 keypad2	KEYWORD3
