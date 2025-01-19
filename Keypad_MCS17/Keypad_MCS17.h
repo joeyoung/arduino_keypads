@@ -1,7 +1,7 @@
 /*
 ||
 || @file Keypad_MCS17.h
-|| @version 1.1 SPI
+|| @version 1.2 SPI
 || @author G. D. (Joe) Young / SPI Alyx Vance
 || @contact "G. D. (Joe) Young" <jyoung@islandnet.com>
 ||
@@ -17,6 +17,10 @@
 || | resistors. The 23017 also has more comprehensive support for separate
 || | 8-bit ports instead of a single 16-bit port. However, this library
 || | assumes configuration as 16-bit port--IOCON.BANK = 0.
+|| #
+|| @version SPI 1.2 January 14, 2025
+|| | Keypad_MCS17 revised to allow for 8-bit and 16-bit versions of SPI
+|| | port expanders (MCP23S08, MCP23S17, MCP23S18)
 || #
 ||
 || @version SPI 1.0 December 13, 2024
@@ -58,40 +62,37 @@
 #include "Keypad.h"
 #include "SPI.h"
 
+//These width definitions allow for clearer constructor statement
+#define MCP23S17 2		//two-byte port chip
+#define MCP23S18 2		//two-byte port chip
+#define MCP23S08 1		//one-byte port chip
+#define MCP23S09 1		//one-byte port chip
+
 class Keypad_MCS17 : public Keypad {
 public:
-	Keypad_MCS17(char* userKeymap, byte* row, byte* col, byte numRows, byte numCols, byte address, byte port, SPIClass *_aspi = &SPI ) :
-		Keypad(userKeymap, row, col, numRows, numCols) { cs_port = port; spichip = address; _spi = _aspi; }
+	Keypad_MCS17(char* userKeymap,byte* row,byte* col,byte numRows,byte numCols,byte address,byte port,byte device=2, SPIClass *_aspi = &SPI ) :
+		Keypad(userKeymap, row, col, numRows, numCols) { cs_port = port; spichip = address; width=device, _spi = _aspi; }
 
 	// Keypad function
 	void begin( char *userKeymap );
 	void begin( );
 
-//	void beginnewwire( TwoWire * );
-
 	void pin_mode(byte pinNum, byte mode);
 	void pin_write(byte pinNum, boolean level);
 	int  pin_read(byte pinNum);
-	// read initial value for pinState
 	word pinState_set( );
-	// write a whole word to i2c port
-	void port_write( word i2cportval );
-	// access functions for IODIR state copy
-	word iodir_read( );
+	void port_write( word i2cportval );	// write a whole word to i2c port chip
+	word iodir_read( );					// access functions for IODIR state copy
 	void iodir_write( word iodir );
-
-	void kpdSettings( SPISettings kpd_set );
+	void kpdSettings( SPISettings kpd_set );	//allow sketch to modify SPI specs
 
 private:
     byte cs_port;
-    // device hardware address
-    byte spichip;
+	byte width;				//device width 1 - single byte 2 - two byte
+    byte spichip;           // device hardware address set on pins of chip
 	SPIClass *_spi;
 	SPISettings kpd_settings;
-	// pin_write state persistant storage
-	word pinState;
-//	byte pin_iosetup( );
-	// MCS17 setup
+	word pinState;		    // pin_write state persistant storage
 	word iodir_state;    // copy of IODIR register
 	void _begin( void );
 };
@@ -101,6 +102,7 @@ private:
 
 /*
 || @changelog
+|| | 1.2 2025-01-14 - Joe Young : add support for 8-bit ports-width parameter
 || | 1.1 2025-01-08 - Joe Young : add kpdSettings( ) to allow changing default settings set in begin
 || | 1.0 2024-12-29 - Joe Young : set up as complete library package, use arduino SPI commands
 || | 1.0 SPI 2024-12-13 - Alyx Vance : Made as SPI version for MCP23S17

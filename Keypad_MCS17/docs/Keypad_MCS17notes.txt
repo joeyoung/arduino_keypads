@@ -1,0 +1,22 @@
+Jan 18/25 Keypad_MCS17 library update notes  G. D. (Joe) Young <jyoung@islandnet.com>
+
+The library update now allows for additional SPI port expander IC--MCP23S18, MCP23S08,
+and MCP23S09--in addition to compatible support for MCP23S17 first posted. The MCP23S18
+is a two-byte (16-bit) expander, the other two are one-byte.
+
+The revised library constructor includes an optional literal parameter that defaults to
+the two-byte port, so no change to sketch that uses a MCP23S17 (or 18). The literals are
+defined in the library header are the names of the device (eg MCP23S08) and resolve to
+be either 2 (default) or 1.
+
+Some precautions are needed if these devices are to be used together in the same
+system:
+ - The MCP23S18 is not pin-compatible with the MCP23S17, but both have hardware
+   addressing so can share the same SPI bus and chip-select as long as they are given
+   different hardware addresses.
+ - The MCP23S08 also has hardware addressing so can share the SPI and CS when assigned
+   different hardware addresses. The library constructor has an additional parameter
+   that accepts the name of the device as a literal.
+ - The MCP23S09 is not pin-compatible with the MCP23S08 and does not have hardware
+   addressing so cannot share the SPI unless it is selected with a unique chip select.
+

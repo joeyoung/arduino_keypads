@@ -14,6 +14,9 @@ Keypad_MCS17	KEYWORD1
 ###########################################
 
 MCP23S17	LITERAL1
+MCP23S18	LITERAL1
+MCP23S08	LITERAL1
+MCP23S09	LITERAL1
 
 
 ###########################################
@@ -30,12 +33,10 @@ iodir_write	KEYWORD2
 begin	KEYWORD2
 kpdSettings	KEYWORD2
 
-
 ###########################################
 # objects created in the example sketches.
 ###########################################
 
-kpd	KEYWORD3
 keypad	KEYWORD3
 keypad1	KEYWORD3
 keypad2	KEYWORD3
